@@ -1,33 +1,10 @@
 const app = require('express')();
 
-const cors = require('cors');
-app.use(cors({
-    methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH'],
-    origin: '*',
-    credentials: false
-}));
-// Add headers
-app.use(function (req, res, next) {
-
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', '*');
-
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-
-    // Pass to next layer of middleware
-    next();
-});
 const server = require('http').Server(app);
 
-const io = require('socket.io')(server,  { cors: { origin: '*' } });
+const io = require('socket.io')(server,{
+    allowEIO3: true // false by default this fix issue unsupported protocol
+});
 
 const Redis = require('ioredis');
 const redis = new Redis({
@@ -61,3 +38,7 @@ io.on('connection', function (socket) {
 
 
 server.listen(3000);
+
+app.get('/',function(request, response){
+    response.sendFile(__dirname + '/index.html');
+});
